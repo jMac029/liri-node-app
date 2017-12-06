@@ -27,20 +27,64 @@ let liriBot = {
 
     latestTweets: () => {
 
-        let keys = require("./keys.js");
-        let twitter = require("twitter")
+        let twitterKeys = require("./keys.js")
+        let twitter = require('twitter')
+
+        let params = new twitter({ twitterKeys })
+        params.get('statuses/user_timeline', params, function(error, tweets, response) {
+            if (!error) {
+                console.log(error)
+            }
+            console.log(tweets)
+        });
 
     },
 
     // Search function for Spotify
 
     spotifySearch: () => {
+        let Spotify = require('node-spotify-api')
+
+        let spotify = new Spotify({
+            id: 2e254175821342adbe4f7539157342d7,
+            secret: c9f6eb0b9def4b928ef8e8523ef80cb0
+        });
+
+        spotify.search({ type: 'track', query: searchTerm }, function(err, data) {
+            if (err) {
+                return console.log('Error occurred: ' + err)
+            }
+
+            console.log(data);
+        });
 
     },
 
     // Search function for OMDB request
 
     movieSearch: () => {
+        let request = require("request")
+
+        let queryUrl = "http://www.omdbapi.com/?t=" + searchTerm + "&y=&plot=short&apikey=5e4273b"
+
+        console.log(queryUrl);
+
+        request(queryUrl, function(error, response, body) {
+            if (!error && response.statusCode === 200) {
+                //console.log(body)
+                console.log("Title: " + JSON.parse(body).Title)
+                console.log("Year Released: " + JSON.parse(body).Year)
+                console.log("IMDB Rating: " + JSON.parse(body).imdbRating)
+                console.log("Metascore: " + JSON.parse(body).Metascore)
+                console.log("Country: " + JSON.parse(body).Country)
+                console.log("Language: " + JSON.parse(body).Language)
+                console.log("Plot: " + JSON.parse(body).Plot)
+                console.log("Staring: " + JSON.parse(body).Actors)
+                console.log("US Box Office: " + JSON.parse(body).BoxOffice)
+
+            }
+
+        })
 
     },
 
