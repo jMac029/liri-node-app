@@ -3,10 +3,17 @@
 console.log('this is loaded');
 
 const twitterKeys = {
-    consumer_key: 'd3bZ52n1rGqBFDPqaLNKkIUbn',
-    consumer_secret: 'Ejprw88hRXWXAfVz8d8ZTPRJdlGfsBnXLVx10SegQTWdpANqfy',
-    access_token_key: '938158020877418496-uAUXFe0qLYoWFFpLU3QRS1BCgYmMhoB',
-    access_token_secret: 'k80WxAHi2JiwPSVNIHpJVn0k4QzwNv3cUt4G7pGrWkxWf',
+    consumer_key: 'sKOyRIIXonh51i1TYY0l5sRiP',
+    consumer_secret: 'xIJRvJhAVK2PIJVi4XAy8qqPl099UXhuG1jZ89AoJleZP11fDH',
+    access_token_key: '938158020877418496-Hvu2j8eKGWjzeDEb5Sj5ruaW00zsi5b',
+    access_token_secret: '4LO0Q4LdfxMTigSoLXiNWg7Lk9Q9SOyT8eeCaZfUvXBOi'
 }
 
-module.exports = twitterKeys;
+module.exports = twitterKeys
+
+// const spotifyKeys = {
+//     id: "350a0894450843c5a1da994dfbe5fec4",
+//     secret: "d883fa2303a7402abcd1dcdd4fbe81bf"
+// }
+
+// module.exports = spotifyKeys

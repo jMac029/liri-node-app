@@ -28,14 +28,37 @@ let liriBot = {
     latestTweets: () => {
 
         let twitterKeys = require("./keys.js")
-        let twitter = require('twitter')
+        let Twitter = require('twitter')
 
-        let params = new twitter({ twitterKeys })
-        params.get('statuses/user_timeline', params, function(error, tweets, response) {
+        //console.log(twitterKeys)
+        let client = new Twitter({
+                consumer_key: twitterKeys.consumer_key,
+                consumer_secret: twitterKeys.consumer_secret,
+                access_token_key: twitterKeys.access_token_key,
+                access_token_secret: twitterKeys.access_token_secret
+            })
+            //console.log(client)
+        let params = {
+            screen_name: 'TheRealMacChees',
+            count: 20,
+            exclude_replies: true,
+            tweet_mode: 'extended'
+        }
+        client.get('statuses/user_timeline', params, function(error, tweets, response) {
             if (!error) {
                 console.log(error)
+                    //console.log(tweets[0].tweet.text)
             }
-            console.log(tweets)
+            //console.log(tweets[2])
+
+            for (var i = 1; i < tweets.length; i++) {
+                console.log("")
+                console.log("* * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
+                console.log("")
+                console.log("Tweeted on: " + tweets[i].created_at)
+                console.log("Tweet: " + tweets[i].full_text)
+                    // console.log("- - - - - - - - - - - - - - - - - - - - - - - ")
+            }
         });
 
     },
@@ -43,19 +66,23 @@ let liriBot = {
     // Search function for Spotify
 
     spotifySearch: () => {
-        let Spotify = require('node-spotify-api')
+        let Spotify = require("node-spotify-api")
 
         let spotify = new Spotify({
-            id: 2e254175821342adbe4f7539157342d7,
-            secret: c9f6eb0b9def4b928ef8e8523ef80cb0
-        });
+            id: "350a0894450843c5a1da994dfbe5fec4",
+            secret: "d883fa2303a7402abcd1dcdd4fbe81bf"
+        })
 
         spotify.search({ type: 'track', query: searchTerm }, function(err, data) {
             if (err) {
-                return console.log('Error occurred: ' + err)
+                return console.log('Error occurred: ' + err);
             }
-
-            console.log(data);
+            let track = data.tracks.items[0]
+                //console.log(track);
+            console.log("Artists: " + track.artists[0].name);
+            console.log("Song: " + track.name)
+            console.log("Song Link: " + track.external_urls.spotify)
+            console.log("Album: " + track.album.name)
         });
 
     },
