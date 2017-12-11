@@ -8,6 +8,9 @@ let nodeArgs = process.argv;
 // Empty String searchTerm to use for searching with the API
 let searchTerm = ""
 
+// bringing in the key object from keys.js
+const keys = require('./keys.js')
+
 // Loop to capture all the terms after the process.argv[3] and making them the term to be searched
 for (let i = 3; i < nodeArgs.length; i++) {
 
@@ -22,20 +25,19 @@ for (let i = 3; i < nodeArgs.length; i++) {
     }
 }
 
-let liriBot = {
+const liriBot = {
     // Search function for Twitter
 
     latestTweets: () => {
 
-        let twitterKeys = require("./keys.js")
-        let Twitter = require('twitter')
+        const Twitter = require('twitter')
 
         //console.log(twitterKeys)
         let client = new Twitter({
-                consumer_key: twitterKeys.consumer_key,
-                consumer_secret: twitterKeys.consumer_secret,
-                access_token_key: twitterKeys.access_token_key,
-                access_token_secret: twitterKeys.access_token_secret
+                consumer_key: keys.twitter.consumer_key,
+                consumer_secret: keys.twitter.consumer_secret,
+                access_token_key: keys.twitter.access_token_key,
+                access_token_secret: keys.twitter.access_token_secret
             })
             //console.log(client)
         let params = {
@@ -66,23 +68,35 @@ let liriBot = {
     // Search function for Spotify
 
     spotifySearch: () => {
-        let Spotify = require("node-spotify-api")
+        const Spotify = require("node-spotify-api")
 
         let spotify = new Spotify({
-            id: "350a0894450843c5a1da994dfbe5fec4",
-            secret: "d883fa2303a7402abcd1dcdd4fbe81bf"
+            id: keys.spotify.id,
+            secret: keys.spotify.secret
         })
 
-        spotify.search({ type: 'track', query: searchTerm }, function(err, data) {
+        if (searchTerm === "") {
+            searchTerm = "Ace of Base The Sign"
+        }
+
+        spotify.search({ type: 'track', query: searchTerm, limit: 1 }, function(err, data) {
             if (err) {
                 return console.log('Error occurred: ' + err);
             }
-            let track = data.tracks.items[0]
+            let track = data.tracks.items
                 //console.log(track);
-            console.log("Artists: " + track.artists[0].name);
-            console.log("Song: " + track.name)
-            console.log("Song Link: " + track.external_urls.spotify)
-            console.log("Album: " + track.album.name)
+            for (let i = 0; i < track.length; i++) {
+                console.log("")
+                console.log("* * * * * * * * * * * * * * * * * * ")
+                console.log("")
+                console.log("Artists: " + track[i].artists[0].name);
+                console.log("Song: " + track[i].name)
+                console.log("Song Link: " + track[i].external_urls.spotify)
+                console.log("Album: " + track[i].album.name)
+                console.log("")
+                console.log("* * * * * * * * * * * * * * * * * * ")
+                console.log("")
+            }
         });
 
     },
@@ -90,15 +104,22 @@ let liriBot = {
     // Search function for OMDB request
 
     movieSearch: () => {
-        let request = require("request")
+        const request = require("request")
 
-        let queryUrl = "http://www.omdbapi.com/?t=" + searchTerm + "&y=&plot=short&apikey=5e4273b"
+        if (searchTerm === "") {
+            searchTerm = "Mr. Nobody"
+        }
 
-        console.log(queryUrl);
+        let queryUrl = "http://www.omdbapi.com/?t=" + searchTerm + "&y=&plot=short&apikey=" + keys.omdb.apikey
+
+        //console.log(queryUrl);
 
         request(queryUrl, function(error, response, body) {
             if (!error && response.statusCode === 200) {
                 //console.log(body)
+                console.log("")
+                console.log("* * * * * * * * * * * * * * * * * * ")
+                console.log("")
                 console.log("Title: " + JSON.parse(body).Title)
                 console.log("Year Released: " + JSON.parse(body).Year)
                 console.log("IMDB Rating: " + JSON.parse(body).imdbRating)
@@ -108,6 +129,9 @@ let liriBot = {
                 console.log("Plot: " + JSON.parse(body).Plot)
                 console.log("Staring: " + JSON.parse(body).Actors)
                 console.log("US Box Office: " + JSON.parse(body).BoxOffice)
+                console.log("")
+                console.log("* * * * * * * * * * * * * * * * * * ")
+                console.log("")
 
             }
 
@@ -118,10 +142,28 @@ let liriBot = {
     // Search function for random search
 
     randomSearch: () => {
+        const fs = require("fs");
 
+        fs.readFile("random.txt", "utf8", function(error, random) {
+            if (error) {
+                return console.log(error);
+            }
+
+            // We will then print the contents of data
+            //console.log(random);
+
+            var randomArray = random.split(",");
+
+            apiCommand = randomArray[0]
+            searchTerm = randomArray[1]
+            liriBot.spotifySearch()
+
+        })
     },
 
     writeToLog: () => {
+        let fs = require("fs");
+
 
     }
 }
