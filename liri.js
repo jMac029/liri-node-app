@@ -8,8 +8,11 @@ let nodeArgs = process.argv;
 // Empty String searchTerm to use for searching with the API
 let searchTerm = ""
 
-// bringing in the key object from keys.js
+// bringing in the key object from keys.js as a immutable constant since they cannot be changed
 const keys = require('./keys.js')
+
+// constant for fs since it will be used in several functions
+const fs = require("fs");
 
 // Loop to capture all the terms after the process.argv[3] and making them the term to be searched
 for (let i = 3; i < nodeArgs.length; i++) {
@@ -32,34 +35,36 @@ const liriBot = {
 
         const Twitter = require('twitter')
 
-        //console.log(twitterKeys)
-        let client = new Twitter({
+        let twitter = new Twitter({
                 consumer_key: keys.twitter.consumer_key,
                 consumer_secret: keys.twitter.consumer_secret,
                 access_token_key: keys.twitter.access_token_key,
                 access_token_secret: keys.twitter.access_token_secret
             })
-            //console.log(client)
+            // search paramaters
         let params = {
             screen_name: 'TheRealMacChees',
             count: 20,
             exclude_replies: true,
             tweet_mode: 'extended'
         }
-        client.get('statuses/user_timeline', params, function(error, tweets, response) {
+        twitter.get('statuses/user_timeline', params, function(error, tweets, response) {
             if (!error) {
                 console.log(error)
-                    //console.log(tweets[0].tweet.text)
             }
-            //console.log(tweets[2])
 
+            // loop through tweets for the log
             for (var i = 1; i < tweets.length; i++) {
-                console.log("")
-                console.log("* * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
-                console.log("")
-                console.log("Tweeted on: " + tweets[i].created_at)
-                console.log("Tweet: " + tweets[i].full_text)
-                    // console.log("- - - - - - - - - - - - - - - - - - - - - - - ")
+                let twitterLog = (
+                        "\n* * * * * * * * * * * * * * * * * * " +
+                        "\n" +
+                        "\nTweeted on: " + tweets[i].created_at +
+                        "\nTweet: " + tweets[i].full_text
+                    )
+                    // print twitterLog to the screen
+                console.log(twitterLog)
+                    // write twitterLog to the log file
+                liriBot.writeToLog(twitterLog)
             }
         });
 
@@ -75,6 +80,7 @@ const liriBot = {
             secret: keys.spotify.secret
         })
 
+        // if now song is given to search for search for The Sign by Ace of Base
         if (searchTerm === "") {
             searchTerm = "Ace of Base The Sign"
         }
@@ -86,16 +92,21 @@ const liriBot = {
             let track = data.tracks.items
                 //console.log(track);
             for (let i = 0; i < track.length; i++) {
-                console.log("")
-                console.log("* * * * * * * * * * * * * * * * * * ")
-                console.log("")
-                console.log("Artists: " + track[i].artists[0].name);
-                console.log("Song: " + track[i].name)
-                console.log("Song Link: " + track[i].external_urls.spotify)
-                console.log("Album: " + track[i].album.name)
-                console.log("")
-                console.log("* * * * * * * * * * * * * * * * * * ")
-                console.log("")
+                let songLog = (
+                        "\n* * * * * * * * * * * * * * * * * * " +
+                        "\n" +
+                        "\nArtists: " + track[i].artists[0].name +
+                        "\nSong: " + track[i].name +
+                        "\nSong Link: " + track[i].external_urls.spotify +
+                        "\nAlbum: " + track[i].album.name +
+                        "\n" +
+                        "\n* * * * * * * * * * * * * * * * * * " +
+                        "\n"
+                    )
+                    // print songLog to the screen
+                console.log(songLog)
+                    // write songLog results to log file
+                liriBot.writeToLog(songLog)
             }
         });
 
@@ -106,6 +117,7 @@ const liriBot = {
     movieSearch: () => {
         const request = require("request")
 
+        // if no movie is given to search for search for Mr. Nobody
         if (searchTerm === "") {
             searchTerm = "Mr. Nobody"
         }
@@ -116,22 +128,28 @@ const liriBot = {
 
         request(queryUrl, function(error, response, body) {
             if (!error && response.statusCode === 200) {
-                //console.log(body)
-                console.log("")
-                console.log("* * * * * * * * * * * * * * * * * * ")
-                console.log("")
-                console.log("Title: " + JSON.parse(body).Title)
-                console.log("Year Released: " + JSON.parse(body).Year)
-                console.log("IMDB Rating: " + JSON.parse(body).imdbRating)
-                console.log("Metascore: " + JSON.parse(body).Metascore)
-                console.log("Country: " + JSON.parse(body).Country)
-                console.log("Language: " + JSON.parse(body).Language)
-                console.log("Plot: " + JSON.parse(body).Plot)
-                console.log("Staring: " + JSON.parse(body).Actors)
-                console.log("US Box Office: " + JSON.parse(body).BoxOffice)
-                console.log("")
-                console.log("* * * * * * * * * * * * * * * * * * ")
-                console.log("")
+                //console.log(JSON.parse(body))
+                let json = JSON.parse(body)
+                let movieLog = (
+                        "\n* * * * * * * * * * * * * * * * * * " +
+                        "\n" +
+                        "\nTitle: " + json.Title +
+                        "\nYear Released: " + json.Year +
+                        "\nIMDB Rating: " + json.imdbRating +
+                        "\nRotten Tomatoes Rating: " + json.Ratings[1].Value +
+                        "\nCountry: " + json.Country +
+                        "\nLanguage: " + json.Language +
+                        "\nPlot: " + json.Plot +
+                        "\nStaring: " + json.Actors +
+                        "\nUS Box Office: " + json.BoxOffice +
+                        "\n" +
+                        "\n* * * * * * * * * * * * * * * * * * " +
+                        "\n"
+                    )
+                    // print movieLog to the screen
+                console.log(movieLog)
+                    // write movieLog results to log file
+                liriBot.writeToLog(movieLog)
 
             }
 
@@ -142,7 +160,6 @@ const liriBot = {
     // Search function for random search
 
     randomSearch: () => {
-        const fs = require("fs");
 
         fs.readFile("random.txt", "utf8", function(error, random) {
             if (error) {
@@ -161,10 +178,15 @@ const liriBot = {
         })
     },
 
-    writeToLog: () => {
-        let fs = require("fs");
+    // Function to write to log file
 
+    writeToLog: (logEntry) => {
 
+        fs.appendFile('log.txt', logEntry, err => {
+            if (err) {
+                throw err
+            }
+        })
     }
 }
 
